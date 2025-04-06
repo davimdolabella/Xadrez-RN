@@ -11,6 +11,8 @@ export default  props => {
             width: size || 50,
             height: size || 50,
             backgroundColor: color,
+            justifyContent: 'center',
+            alignItems: 'center',
         },
     })
     return (
