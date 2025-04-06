@@ -6,7 +6,7 @@ export default props =>{
     const styles = StyleSheet.create({
         peca:{
             fontSize: 40,
-            color: props.cor === 'w'? '#b8b1b0': 'black',
+            color: props.cor === 'w'? '#b8b1b0':props.cor === 'b'? 'black': 'rgba(0,0,0,0.2)',
             fontWeight: 'bold',
             textAlign: 'center',
             lineHeight: 50,
