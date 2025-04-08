@@ -1,2 +1,2 @@
 # Xadrez-RN
- Jogo de Xadrz com React Native
+ Jogo de Xadrez com React Native
