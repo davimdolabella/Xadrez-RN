@@ -35,30 +35,58 @@ export default class Xadrez extends React.Component {
   }
 
   pecaclicada = (peca_detail) => {
-    if (!this.state.select) {
-        if (peca_detail.cor !== this.state.turn) {
-          return
+    if (this.state.select === false && peca_detail.nome !== null && peca_detail.cor === this.state.turn) {
+      this.setState({
+        selects: [peca_detail, null],
+        select: true,
+      })
+      this.mostrarcasaspossiveis(peca_detail)
+
+    }else if(peca_detail.selectable){
+        let tabuleiro = this.state.tabuleiro
+        let peca = this.state.selects[0]
+        tabuleiro[peca.col][peca.lin] = null
+        tabuleiro[peca_detail.col][peca_detail.lin] = peca.nome+'_'+ peca.cor + '_n_'+ peca.piecemoves + 1
+            this.setState({
+                selects: [null, null],
+                select: false,
+            })
         }
-      if (peca_detail.nome !== null) {
-        this.setState({ select: true, selects: [peca_detail, null] })
-      } else {
-        return
-      }
-    } else {
-      const tabuleiro = this.state.tabuleiro
-      const posicpeca1 = [this.state.selects[0].col, this.state.selects[0].lin]
-      const posicpeca2 = [peca_detail.col, peca_detail.lin]
-      const peca1 = this.state.tabuleiro[posicpeca1[0]][posicpeca1[1]]
-      const peca2 = this.state.tabuleiro[posicpeca2[0]][posicpeca2[1]]
-      if (peca1 === peca2 || this.state.selects[0].cor === peca_detail.cor) {
-        this.setState({ select: false, selects: [null, null]})
-        return
-        }
-      tabuleiro[posicpeca2[0]][posicpeca2[1]] = peca1
-      tabuleiro[posicpeca1[0]][posicpeca1[1]] = null
-      this.setState({ select: false, selects: [null, null], tabuleiro, turn: this.state.turn === 'w' ? 'b' : 'w' })
-    }
+
   }
+
+  mostrarcasaspossiveis = (peca) => {
+    // Limpa seleções anteriores
+    const tabuleiro = this.state.tabuleiro.map(linha =>
+      linha.map(p => {
+        if (p && typeof p === 'string') {
+          let parts = p.split('_')
+          if (parts.length < 3) return p
+          parts[2] = null // remove 'o' de casas marcadas como selecionáveis
+          return parts.join('_')
+        }
+        return p
+      })
+    )
+  
+    // Teste simples: marca uma casa à frente do peão
+    if (peca.nome === 'p') {
+      let dir = peca.cor === 'w' ? -1 : 1
+      let newRow = peca.lin + dir
+      let col = peca.col
+  
+      if (
+        newRow >= 0 && newRow < 8 &&
+        tabuleiro[newRow][col] === null
+      ) {
+        tabuleiro[newRow][col] = 'o_o_o' // marca como selecionável
+      }
+    }
+  
+    this.setState({ tabuleiro })
+  }
+  
+  
 
   render() {
     return (
@@ -74,10 +102,12 @@ export default class Xadrez extends React.Component {
             <View key={lin} style={styles.lin}>
               {Array.from({ length: 8 }).map((_, col) => {
                 const color = (lin + col) % 2 === 0 ? 'white' : 'black'
-                const peca_detail =
+                let peca_detail =
                   this.state.tabuleiro[col][lin] !== null
                     ? this.state.tabuleiro[col][lin].split('_')
                     : [null, null]
+
+                peca_detail = peca_detail[0] !== null && peca_detail[0] === 'o' ? [null,null,'o',null] : peca_detail
 
                 return (
                   <Quadrado
@@ -92,6 +122,9 @@ export default class Xadrez extends React.Component {
                         cor: peca_detail[1],
                         lin: lin,
                         col: col,
+                        selectable: peca_detail[2] === 'o',
+                        piecemoves: peca_detail[3] ? parseInt(peca_detail[3]) : 0
+
                       })
                     }
                   >
@@ -100,7 +133,7 @@ export default class Xadrez extends React.Component {
                       cor={peca_detail[1]}
                       lin={lins[lin]}
                       col={-1 * (col - 8)}
-                      select={this.state.select}
+                      select={peca_detail[2] === 'o'}
                     />
                   </Quadrado>
                 )
