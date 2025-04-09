@@ -14,8 +14,8 @@ export default props =>{
     })
     return(
         <Text style={styles.peca}>
-            {props.tipo}
-            {props.tipo === null && props.select? 'o': null}
+            {props.tipo === 'null'? 'o' : props.tipo}
+            {props.tipo === null && props.select? 'x': null}
         </Text>
     )
 }

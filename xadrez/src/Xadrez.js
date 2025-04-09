@@ -50,40 +50,60 @@ export default class Xadrez extends React.Component {
             this.setState({
                 selects: [null, null],
                 select: false,
+                turn: this.state.turn === 'w' ? 'b' : 'w',
+                tabuleiro
             })
+          this.limparcasaspossiveis()
         }
-
   }
-
-  mostrarcasaspossiveis = (peca) => {
-    // Limpa seleções anteriores
-    const tabuleiro = this.state.tabuleiro.map(linha =>
-      linha.map(p => {
-        if (p && typeof p === 'string') {
-          let parts = p.split('_')
-          if (parts.length < 3) return p
-          parts[2] = null // remove 'o' de casas marcadas como selecionáveis
-          return parts.join('_')
+  limparcasaspossiveis = () => {
+    let tabuleiro = this.state.tabuleiro
+    Array.from({ length: 8 }).map((_, lin) => (
+      Array.from({ length: 8 }).map((_, col) => {
+        let peca_detail =
+          this.state.tabuleiro[col][lin] !== null
+            ? this.state.tabuleiro[col][lin].split('_')
+            : [null, null]
+        if (peca_detail[2] === 'o') {
+          tabuleiro[col][lin] = peca_detail[0] + '_' + peca_detail[1] + '_n_' + peca_detail[3]
         }
-        return p
       })
-    )
-  
-    // Teste simples: marca uma casa à frente do peão
-    if (peca.nome === 'p') {
-      let dir = peca.cor === 'w' ? -1 : 1
-      let newRow = peca.lin + dir
-      let col = peca.col
-  
-      if (
-        newRow >= 0 && newRow < 8 &&
-        tabuleiro[newRow][col] === null
-      ) {
-        tabuleiro[newRow][col] = 'o_o_o' // marca como selecionável
+    ))
+    this.setState({
+      tabuleiro,
+    })
+  }
+  mostrarcasaspossiveis = (peca_detail) => {
+    let posicpossiveis = []
+    let tabuleiro =  this.state.tabuleiro
+    if (peca_detail.nome === 'p'){
+      if (peca_detail.cor === 'w') {
+        posicpossiveis.push([peca_detail.col- 1, peca_detail.lin ])
+        if (peca_detail.piecemoves === 0) {
+          posicpossiveis.push([peca_detail.col - 2, peca_detail.lin])
+        }
+      } else {
+        posicpossiveis.push([peca_detail.col+ 1, peca_detail.lin ])
+        if (peca_detail.piecemoves === 0) {
+          posicpossiveis.push([peca_detail.col + 2, peca_detail.lin])
+        }
       }
     }
-  
-    this.setState({ tabuleiro })
+    Array.from({ length: 8 }).map((_, lin) => (
+        Array.from({ length: 8 }).map((_, col) => {
+          const existe = posicpossiveis.some(p => p[0] === col && p[1] === lin);
+          let peca_detail =
+                  this.state.tabuleiro[col][lin] !== null
+                    ? this.state.tabuleiro[col][lin].split('_')
+                    : [null, null]
+          if (existe) {
+            tabuleiro[col][lin] = peca_detail !== null? peca_detail[0]+'_'+ peca_detail[1] + '_o_' + peca_detail[3] : 'o_'
+          }
+            })
+    ))
+    this.setState({
+      tabuleiro,
+    })
   }
   
   
