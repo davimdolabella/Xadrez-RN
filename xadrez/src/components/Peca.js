@@ -10,13 +10,31 @@ export default props =>{
             fontWeight: 'bold',
             textAlign: 'center',
             lineHeight: 50,
+        },
+        select:{
+            position: 'absolute',
+            top: props.tipo !== 'null'? -40 : -10,
+            fontSize: props.tipo !== 'null'? 80 : 50,
+            color:'rgba(0,0,0,0.2)',
+            fontWeight: 'bold',
+            textAlign: 'center',
         }
     })
     return(
+        <>
         <Text style={styles.peca}>
-            {props.tipo === 'null'? 'o' : props.tipo}
-            {props.tipo === null && props.select? 'x': null}
+            {props.tipo === 'p'? '♟' : null}
+            {props.tipo === 't'? '♖' : null}
+            {props.tipo === 'c'? '♞' : null}
+            {props.tipo === 'b'? '♗' : null}
+            {props.tipo === 'ra'? '♕' : null}
+            {props.tipo === 're'? '♔' : null}
         </Text>
+        <Text style={styles.select}>
+            {props.select? 'o' :null}
+        </Text>
+        </>
+        
     )
 }
 

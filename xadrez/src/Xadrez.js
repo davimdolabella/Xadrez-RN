@@ -35,6 +35,13 @@ export default class Xadrez extends React.Component {
   }
 
   pecaclicada = (peca_detail) => {
+    if (this.state.selects[0] !== null && (this.state.selects[0].cor === peca_detail.cor || (peca_detail.nome === null && !peca_detail.selectable)) ) {
+      this.setState({
+        selects: [null, null],
+        select: false,
+      })
+      this.limparcasaspossiveis()
+    }
     if (this.state.select === false && peca_detail.nome !== null && peca_detail.cor === this.state.turn) {
       this.setState({
         selects: [peca_detail, null],
