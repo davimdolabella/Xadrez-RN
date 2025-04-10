@@ -21,6 +21,7 @@ const initialstate = {
   turn: 'w',
   selects: [null, null],
   select: false,
+  enpassant: null
 }
 
 export default class Xadrez extends React.Component {
@@ -32,6 +33,7 @@ export default class Xadrez extends React.Component {
     turn: 'w',
     selects: [null, null],
     select: false,
+    enpassant: null, 
   }
   getpecadetail(lin, col){
     let tabuleiro = this.state.tabuleiro
@@ -64,6 +66,16 @@ export default class Xadrez extends React.Component {
     }else if(peca_detail.selectable){
         let tabuleiro = this.state.tabuleiro
         let peca = this.state.selects[0]
+        let anterior = this.getpecadetail(this.state.turn === 'w'? peca_detail.lin + 1: peca_detail.lin-1, peca_detail.col)
+        if(this.state.enpassant != null){
+          if(peca.nome === 'p' && anterior[0] === 'p'){
+            tabuleiro[this.state.turn === 'w'? peca_detail.lin + 1: peca_detail.lin-1][peca_detail.col] = null
+          }
+          this.setState({enpassant: null})
+        }else if(peca.nome === 'p' && peca.piecemoves === 0 && (peca_detail.lin === peca.lin + 2 || peca_detail.lin === peca.lin - 2)){
+          this.setState({enpassant:peca_detail})
+        }
+
         tabuleiro[peca.lin][peca.col] = null
         tabuleiro[peca_detail.lin][peca_detail.col] = peca.nome+'_'+ peca.cor + '_n_'+ peca.piecemoves + 1
             this.setState({
@@ -75,6 +87,7 @@ export default class Xadrez extends React.Component {
           this.limparcasaspossiveis()
         }
   }
+
   limparcasaspossiveis = () => {
     let tabuleiro = this.state.tabuleiro
     Array.from({ length: 8 }).map((_, col) => (
@@ -89,48 +102,44 @@ export default class Xadrez extends React.Component {
       tabuleiro,
     })
   }
+
+  posicpossiveis_peao = (peca_detail) =>{
+    let direction = peca_detail.cor === 'w'? 1 : -1
+    let posicpossiveis = []
+    let diagonaldireita = this.getpecadetail(peca_detail.lin -1 * direction, peca_detail.col + 1 * direction)
+    let diagonalesquerda = this.getpecadetail(peca_detail.lin -1 * direction, peca_detail.col -1 * direction)
+
+    let andada1 = this.getpecadetail(peca_detail.lin - 1 * direction, peca_detail.col)
+    let andada2 = this.getpecadetail(peca_detail.lin - 2 * direction, peca_detail.col)
+    if(this.state.enpassant !== null){
+      if(peca_detail.lin === this.state.enpassant.lin && peca_detail.col - 1 * direction ===  this.state.enpassant.col){
+          posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col - 1* direction])
+      }else if (peca_detail.lin === this.state.enpassant.lin && peca_detail.col + 1 * direction ===  this.state.enpassant.col){
+          posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col + 1* direction])
+      }   
+    }
+    if (pecas.includes(diagonaldireita[0]) && diagonaldireita[1] !== peca_detail.cor){
+      posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col + 1* direction])
+    }
+    if (pecas.includes(diagonalesquerda[0]) && diagonalesquerda[1] !== peca_detail.cor){
+      posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col - 1* direction])
+    }
+    if(!pecas.includes(andada1[0])){
+      posicpossiveis.push([peca_detail.lin- 1 * direction, peca_detail.col ])
+
+      if (peca_detail.piecemoves === 0 && !pecas.includes(andada2[0])) {
+        posicpossiveis.push([peca_detail.lin - 2 * direction, peca_detail.col])
+      }
+    }
+    return posicpossiveis
+
+  }
+
   mostrarcasaspossiveis = (peca_detail) => {
     let posicpossiveis = []
     let tabuleiro =  this.state.tabuleiro
     if (peca_detail.nome === 'p'){
-      if (peca_detail.cor === 'w') {
-        let diagonaldireita = this.getpecadetail(peca_detail.lin -1, peca_detail.col + 1)
-        let diagonalesquerda = this.getpecadetail(peca_detail.lin -1, peca_detail.col - 1)
-        if (pecas.includes(diagonaldireita[0]) && diagonaldireita[1] !== peca_detail.cor){
-          posicpossiveis.push([peca_detail.lin -1 , peca_detail.col + 1])
-        }
-        if (pecas.includes(diagonalesquerda[0]) && diagonalesquerda[1] !== peca_detail.cor){
-          posicpossiveis.push([peca_detail.lin -1 , peca_detail.col - 1])
-        }
-        let andada1 = this.getpecadetail(peca_detail.lin - 1, peca_detail.col)
-        let andada2 = this.getpecadetail(peca_detail.lin - 2, peca_detail.col)
-        if(!pecas.includes(andada1[0])){
-          posicpossiveis.push([peca_detail.lin- 1, peca_detail.col ])
-
-          if (peca_detail.piecemoves === 0 && !pecas.includes(andada2[0])) {
-            posicpossiveis.push([peca_detail.lin - 2, peca_detail.col])
-          }
-        }
-      } else {
-        let diagonaldireita = this.getpecadetail(peca_detail.lin +1, peca_detail.col - 1)
-        let diagonalesquerda = this.getpecadetail(peca_detail.lin +1, peca_detail.col + 1)
-        if (pecas.includes(diagonaldireita[0]) && diagonaldireita[1] !== peca_detail.cor){
-          posicpossiveis.push([peca_detail.lin +1 , peca_detail.col - 1])
-        }
-        if (pecas.includes(diagonalesquerda[0]) && diagonalesquerda[1] !== peca_detail.cor){
-          posicpossiveis.push([peca_detail.lin +1 , peca_detail.col + 1])
-        }
-        let andada1 = this.getpecadetail(peca_detail.lin + 1, peca_detail.col)
-        let andada2 = this.getpecadetail(peca_detail.lin + 2, peca_detail.col)
-        if(!pecas.includes(andada1[0])){
-          posicpossiveis.push([peca_detail.lin+ 1, peca_detail.col ])
-
-          if (peca_detail.piecemoves === 0 && !pecas.includes(andada2[0])) {
-            posicpossiveis.push([peca_detail.lin + 2, peca_detail.col])
-          }
-        }
-        
-      }
+      posicpossiveis = this.posicpossiveis_peao(peca_detail)
     }
     Array.from({ length: 8 }).map((_, col) => (
         Array.from({ length: 8 }).map((_, lin) => {
@@ -175,8 +184,6 @@ export default class Xadrez extends React.Component {
                 return (
                   <Quadrado
                     key={`${col}-${lin}`}
-                    col={cols[col]}
-                    lin={-1 * (lin - 8)}
                     color={color}
                     size={this.quadradosize}
                     onPress={() =>
