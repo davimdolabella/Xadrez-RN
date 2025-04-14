@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native'
 import Quadrado from './components/Quadrado'
 import Peca from './components/Peca'
+import peao from './pecas/peao'
 
 const cols = 'abcdefgh'
 const pecas = ['p', 't', 'c', 'b', 'ra', 're']
@@ -35,7 +36,8 @@ export default class Xadrez extends React.Component {
     select: false,
     enpassant: null, 
   }
-  getpecadetail(lin, col){
+  is_valid = (lin_or_col) => lin_or_col < 8 && lin_or_col >= 0
+  getpecadetail = (lin, col)=>{
     let tabuleiro = this.state.tabuleiro
     let peca_detail = tabuleiro[lin][col] !== null ? tabuleiro[lin][col].split('_') : [null, null]
     return peca_detail
@@ -103,43 +105,11 @@ export default class Xadrez extends React.Component {
     })
   }
 
-  posicpossiveis_peao = (peca_detail) =>{
-    let direction = peca_detail.cor === 'w'? 1 : -1
-    let posicpossiveis = []
-    let diagonaldireita = this.getpecadetail(peca_detail.lin -1 * direction, peca_detail.col + 1 * direction)
-    let diagonalesquerda = this.getpecadetail(peca_detail.lin -1 * direction, peca_detail.col -1 * direction)
-
-    let andada1 = this.getpecadetail(peca_detail.lin - 1 * direction, peca_detail.col)
-    let andada2 = this.getpecadetail(peca_detail.lin - 2 * direction, peca_detail.col)
-    if(this.state.enpassant !== null){
-      if(peca_detail.lin === this.state.enpassant.lin && peca_detail.col - 1 * direction ===  this.state.enpassant.col){
-          posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col - 1* direction])
-      }else if (peca_detail.lin === this.state.enpassant.lin && peca_detail.col + 1 * direction ===  this.state.enpassant.col){
-          posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col + 1* direction])
-      }   
-    }
-    if (pecas.includes(diagonaldireita[0]) && diagonaldireita[1] !== peca_detail.cor){
-      posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col + 1* direction])
-    }
-    if (pecas.includes(diagonalesquerda[0]) && diagonalesquerda[1] !== peca_detail.cor){
-      posicpossiveis.push([peca_detail.lin -1 * direction, peca_detail.col - 1* direction])
-    }
-    if(!pecas.includes(andada1[0])){
-      posicpossiveis.push([peca_detail.lin- 1 * direction, peca_detail.col ])
-
-      if (peca_detail.piecemoves === 0 && !pecas.includes(andada2[0])) {
-        posicpossiveis.push([peca_detail.lin - 2 * direction, peca_detail.col])
-      }
-    }
-    return posicpossiveis
-
-  }
-
   mostrarcasaspossiveis = (peca_detail) => {
     let posicpossiveis = []
     let tabuleiro =  this.state.tabuleiro
     if (peca_detail.nome === 'p'){
-      posicpossiveis = this.posicpossiveis_peao(peca_detail)
+      posicpossiveis = peao(peca_detail, this.getpecadetail, this.state.enpassant, this.is_valid, pecas)
     }
     Array.from({ length: 8 }).map((_, col) => (
         Array.from({ length: 8 }).map((_, lin) => {
