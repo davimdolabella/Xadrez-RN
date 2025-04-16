@@ -5,6 +5,10 @@ import Peca from './components/Peca'
 import peao from './pecas/peao'
 import torre from './pecas/torre'
 import rainha from './pecas/rainha'
+import bispo from './pecas/bispo'
+import cavalo from './pecas/cavalo'
+import rei from './pecas/rei'
+
 
 const cols = 'abcdefgh'
 const pecas = ['p', 't', 'c', 'b', 'ra', 're']
@@ -114,7 +118,10 @@ export default class Xadrez extends React.Component {
     let tabuleiro =  this.state.tabuleiro
     const movimentos = {
       t: torre,
-      ra: rainha
+      b: bispo,
+      c: cavalo,
+      ra: rainha,
+      re: rei
     }
     const funcaoMovimento = movimentos[peca_detail.nome]
     if (funcaoMovimento) {
