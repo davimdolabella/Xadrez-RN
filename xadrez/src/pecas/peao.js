@@ -1,5 +1,4 @@
 export default (peca_detail, getpecadetail, enpassant, is_valid, pecas) =>{
-    
         let direction = peca_detail.cor === 'w'? 1 : -1
         let posicpossiveis = []
         let diagonaldireita = [null,null]

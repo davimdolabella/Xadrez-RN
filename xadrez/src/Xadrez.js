@@ -3,6 +3,8 @@ import { View, Dimensions, Text, TouchableOpacity } from 'react-native'
 import Quadrado from './components/Quadrado'
 import Peca from './components/Peca'
 import peao from './pecas/peao'
+import torre from './pecas/torre'
+import rainha from './pecas/rainha'
 
 const cols = 'abcdefgh'
 const pecas = ['p', 't', 'c', 'b', 'ra', 're']
@@ -22,7 +24,8 @@ const initialstate = {
   turn: 'w',
   selects: [null, null],
   select: false,
-  enpassant: null
+  enpassant: null,
+  roque: [true,true]
 }
 
 export default class Xadrez extends React.Component {
@@ -35,6 +38,7 @@ export default class Xadrez extends React.Component {
     selects: [null, null],
     select: false,
     enpassant: null, 
+    roque: [true,true]
   }
   is_valid = (lin_or_col) => lin_or_col < 8 && lin_or_col >= 0
   getpecadetail = (lin, col)=>{
@@ -108,6 +112,14 @@ export default class Xadrez extends React.Component {
   mostrarcasaspossiveis = (peca_detail) => {
     let posicpossiveis = []
     let tabuleiro =  this.state.tabuleiro
+    const movimentos = {
+      t: torre,
+      ra: rainha
+    }
+    const funcaoMovimento = movimentos[peca_detail.nome]
+    if (funcaoMovimento) {
+      posicpossiveis = funcaoMovimento(peca_detail, this.getpecadetail, this.is_valid, pecas)
+    }
     if (peca_detail.nome === 'p'){
       posicpossiveis = peao(peca_detail, this.getpecadetail, this.state.enpassant, this.is_valid, pecas)
     }
