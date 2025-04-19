@@ -1,5 +1,4 @@
 export default(right_or_left = "right" , up_or_down = "down",peca_detail, getpecadetail ,is_valid , pecas, limit= false )=>{
-    console.warn("njn")
     let posicpossiveis = []
     let lin_direction = up_or_down === "down"? 1 : -1
     let col_direction = right_or_left === "right"? 1: -1

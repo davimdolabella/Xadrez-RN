@@ -29,7 +29,8 @@ const initialstate = {
   selects: [null, null],
   select: false,
   enpassant: null,
-  roque: [true,true]
+  roque: [true,true],
+  xeque: false
 }
 
 export default class Xadrez extends React.Component {
@@ -42,7 +43,29 @@ export default class Xadrez extends React.Component {
     selects: [null, null],
     select: false,
     enpassant: null, 
-    roque: [true,true]
+    roque: [true,true],
+    xeque: false
+  }
+  this_is_xeque = (lin,col)=>{
+    let peca = this.getpecadetail(lin,col)
+    let posicpossiveis = []
+    const movimentos = {
+      t: torre,
+      b: bispo,
+      c: cavalo,
+      ra: rainha,
+      re: rei
+    }
+    const funcaoMovimento = movimentos[peca_detail.nome]
+    if (funcaoMovimento && (peca_detail.nome === 're' || !this.state.xeque)) {
+      posicpossiveis = funcaoMovimento(peca_detail, this.getpecadetail, this.is_valid, pecas)
+    }
+    if (peca_detail.nome === 'p' && !this.state.xeque){
+      posicpossiveis = peao(peca_detail, this.getpecadetail, this.state.enpassant, this.is_valid, pecas)
+    }
+    for(let i = 0; i < 7; i++){
+      console.warn(posicpossiveis[i])
+    }
   }
   is_valid = (lin_or_col) => lin_or_col < 8 && lin_or_col >= 0
   getpecadetail = (lin, col)=>{
@@ -76,8 +99,9 @@ export default class Xadrez extends React.Component {
     }else if(peca_detail.selectable){
         let tabuleiro = this.state.tabuleiro
         let peca = this.state.selects[0]
-        let anterior = this.getpecadetail(this.state.turn === 'w'? peca_detail.lin + 1: peca_detail.lin-1, peca_detail.col)
-        if(this.state.enpassant != null){
+        let anterior = this.is_valid(peca_detail.lin+1) && this.is_valid(peca_detail.lin-1)? 
+        this.getpecadetail(this.state.turn === 'w'? peca_detail.lin + 1: peca_detail.lin-1, peca_detail.col) : false
+        if(this.state.enpassant != null && anterior){
           if(peca.nome === 'p' && anterior[0] === 'p'){
             tabuleiro[this.state.turn === 'w'? peca_detail.lin + 1: peca_detail.lin-1][peca_detail.col] = null
           }
@@ -85,17 +109,21 @@ export default class Xadrez extends React.Component {
         }else if(peca.nome === 'p' && peca.piecemoves === 0 && (peca_detail.lin === peca.lin + 2 || peca_detail.lin === peca.lin - 2)){
           this.setState({enpassant:peca_detail})
         }
-
-        tabuleiro[peca.lin][peca.col] = null
-        tabuleiro[peca_detail.lin][peca_detail.col] = peca.nome+'_'+ peca.cor + '_n_'+ peca.piecemoves + 1
-            this.setState({
-                selects: [null, null],
-                select: false,
-                turn: this.state.turn === 'w' ? 'b' : 'w',
-                tabuleiro
-            })
+          tabuleiro[peca.lin][peca.col] = null
+          let piecemoves = Number(peca.piecemoves) + 1
+          tabuleiro[peca_detail.lin][peca_detail.col] = peca.nome+'_'+ peca.cor + '_n_'+ piecemoves
+          this.setState({
+              selects: [null, null],
+              select: false,
+              turn: this.state.turn === 'w' ? 'b' : 'w',
+              tabuleiro
+          })
           this.limparcasaspossiveis()
-        }
+          if(this.this_is_xeque(peca_detail.lin, peca_detail.col)){
+            console.warn('xeque')
+          }
+          
+    }
   }
 
   limparcasaspossiveis = () => {
@@ -124,12 +152,13 @@ export default class Xadrez extends React.Component {
       re: rei
     }
     const funcaoMovimento = movimentos[peca_detail.nome]
-    if (funcaoMovimento) {
+    if (funcaoMovimento && (peca_detail.nome === 're' || !this.state.xeque)) {
       posicpossiveis = funcaoMovimento(peca_detail, this.getpecadetail, this.is_valid, pecas)
     }
-    if (peca_detail.nome === 'p'){
+    if (peca_detail.nome === 'p' && !this.state.xeque){
       posicpossiveis = peao(peca_detail, this.getpecadetail, this.state.enpassant, this.is_valid, pecas)
     }
+    
     Array.from({ length: 8 }).map((_, col) => (
         Array.from({ length: 8 }).map((_, lin) => {
           const existe = posicpossiveis.some(p => p[0] === lin && p[1] === col);
