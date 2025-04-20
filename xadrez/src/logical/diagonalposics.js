@@ -1,4 +1,4 @@
-export default(right_or_left = "right" , up_or_down = "down",peca_detail, getpecadetail ,is_valid , pecas, limit= false )=>{
+export default(right_or_left = "right" , up_or_down = "down",peca_detail, tabuleiro ,is_valid , pecas, limit= false )=>{
     let posicpossiveis = []
     let lin_direction = up_or_down === "down"? 1 : -1
     let col_direction = right_or_left === "right"? 1: -1
@@ -8,7 +8,7 @@ export default(right_or_left = "right" , up_or_down = "down",peca_detail, getpec
         let col =peca_detail.col + i * col_direction
         if(is_valid(lin) && is_valid(col)){ 
             
-            let peca =  getpecadetail(lin, col)
+            let peca =  tabuleiro[lin][col]
             if(!pecas.includes(peca[0]) || peca[1] !== peca_detail.cor){
                 posicpossiveis.push([lin , col])
                 if(peca[1] !== peca_detail.cor && (peca[1] === 'w' || peca[1] === 'b')){break}

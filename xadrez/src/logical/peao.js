@@ -1,4 +1,4 @@
-export default (peca_detail, getpecadetail, enpassant, is_valid, pecas) =>{
+export default (peca_detail, tabuleiro, enpassant, is_valid, pecas) =>{
         let direction = peca_detail.cor === 'w'? 1 : -1
         let posicpossiveis = []
         let diagonaldireita = [null,null]
@@ -6,16 +6,16 @@ export default (peca_detail, getpecadetail, enpassant, is_valid, pecas) =>{
         let andada2 = [null, null]
         let andada1 = [null,null]
         if (is_valid(peca_detail.lin -1 * direction) && is_valid(peca_detail.col + 1 *direction)){
-          diagonaldireita = getpecadetail(peca_detail.lin -1 * direction, peca_detail.col + 1 * direction)
+          diagonaldireita = tabuleiro[peca_detail.lin -1 * direction][ peca_detail.col + 1 * direction]
         }
         if (is_valid(peca_detail.lin -1 * direction) && is_valid(peca_detail.col - 1 *direction)){
-          diagonalesquerda = getpecadetail(peca_detail.lin -1 * direction, peca_detail.col -1 * direction)
+          diagonalesquerda = tabuleiro[peca_detail.lin -1 * direction][ peca_detail.col - 1 * direction]
         }
         if (is_valid(peca_detail.lin - 1 * direction) ){
-          andada1 = getpecadetail(peca_detail.lin - 1 * direction, peca_detail.col)
+          andada1 = tabuleiro[peca_detail.lin -1 * direction][ peca_detail.col]
         }
         if (is_valid(peca_detail.lin - 2 * direction) ){
-          andada2 = getpecadetail(peca_detail.lin - 2 * direction, peca_detail.col)
+          andada2 = tabuleiro[peca_detail.lin -2 * direction][ peca_detail.col]
         }
         
         
