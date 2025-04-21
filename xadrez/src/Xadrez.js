@@ -8,64 +8,82 @@ import rainha from './logical/rainha'
 import bispo from './logical/bispo'
 import cavalo from './logical/cavalo'
 import rei from './logical/rei'
-import tabuleiro from './logical/tabuleiro'
+import initialTabuleiro from './logical/tabuleiro'
 // [piece, color, piecemoves, selectable, number of threats]
 
 const cols = 'abcdefgh'
 const pecas = ['p', 't', 'c', 'b', 'ra', 're']
-const initialTabuleiro = tabuleiro
 
-const initialstate = {
+
+const InitialState = () => ({
   tabuleiro: JSON.parse(JSON.stringify(initialTabuleiro)),
   turn: 'w',
   selects: [null, null],
   select: false,
   enpassant: null,
-  roque: [true,true],
+  roque: [true, true],
   xeque: false
-}
+});
 
 export default class Xadrez extends React.Component {
   tabuleirowidth = Dimensions.get('window').width
   quadradosize = this.tabuleirowidth / 8
-
-  state = {
-    tabuleiro: JSON.parse(JSON.stringify(initialTabuleiro)),
-    turn: 'w',
-    selects: [null, null],
-    select: false,
-    enpassant: null, 
-    roque: [true,true],
-    xeque: false
-  }
-  // this_is_xeque = (lin,col)=>{
-  //   let peca = this.getpecadetail(lin,col)
-  //   let posicpossiveis = []
-  //   const movimentos = {
-  //     t: torre,
-  //     b: bispo,
-  //     c: cavalo,
-  //     ra: rainha,
-  //     re: rei
-  //   }
-  //   const funcaoMovimento = movimentos[peca_detail.nome]
-  //   if (funcaoMovimento && (peca_detail.nome === 're' || !this.state.xeque)) {
-  //     posicpossiveis = funcaoMovimento(peca_detail, this.getpecadetail, this.is_valid, pecas)
-  //   }
-  //   if (peca_detail.nome === 'p' && !this.state.xeque){
-  //     posicpossiveis = peao(peca_detail, this.getpecadetail, this.state.enpassant, this.is_valid, pecas)
-  //   }
-  //   for(let i = 0; i < 7; i++){
-  //     console.warn(posicpossiveis[i])
-  //   }
-  // }
-  is_valid = (lin_or_col) => lin_or_col < 8 && lin_or_col >= 0
-  // getpecadetail = (lin, col)=>{
-  //   let tabuleiro = this.state.tabuleiro
-  //   let peca_detail = tabuleiro[lin][col] !== null ? tabuleiro[lin][col].split('_') : [null, null]
-  //   return peca_detail
-  // }
   
+  state = InitialState()
+  // gettabuleiro = JSON.parse(JSON.stringify(this.state.tabuleiro))
+  fimdejogo = (cor) =>{
+
+  }
+  calcposicpossiveis = (peca) => {
+    
+  }
+  rei_em_xeque = (color, tabuleiro) =>{
+    let rei = null
+    Array.from({ length: 8 }).forEach((_, col) => (
+      Array.from({ length: 8 }).forEach((_, lin) => {
+        let peca = tabuleiro[lin][col]
+        if(peca[0] === 're' && peca[1] === color){
+          rei = peca
+        }
+      })
+    ))
+    return rei ? rei[4] > 0 : false
+  }
+  simularmovimento = (origem, destino, tabuleiro) =>{
+    
+    let newtabuleiro = JSON.parse(JSON.stringify(tabuleiro))
+    newtabuleiro[destino[0]][destino[1]] = newtabuleiro[origem[0]][origem[1]]
+    newtabuleiro[origem[0]][origem[1]] = [null,null,false,0,0]
+    newtabuleiro = this.calcameacas(newtabuleiro, false)
+    return newtabuleiro
+  }
+  calcameacas = (tabuleiro, setState = true)=>{
+    
+    tabuleiro = JSON.parse(JSON.stringify(tabuleiro))
+    
+    Array.from({ length: 8 }).map((_, col) => (
+      Array.from({ length: 8 }).map((_, lin) => {
+        let peca = tabuleiro[lin][col]
+        
+       
+        tabuleiro = this.mostrarcasaspossiveis({
+          nome: peca[0],
+          cor: peca[1],
+          col: col,
+          lin: lin,
+          selectable: peca[2],
+          piecemoves: peca[3] },false, tabuleiro, setState)
+
+      })
+    ))
+    
+    if(!setState){
+      return tabuleiro
+    }
+    
+  }
+  is_valid = (lin_or_col) => lin_or_col < 8 && lin_or_col >= 0
+
   pecaclicada = (peca_detail) => {
     if (this.state.selects[0] !== null && (peca_detail.nome === null && !peca_detail.selectable))  {
       this.setState({
@@ -80,14 +98,14 @@ export default class Xadrez extends React.Component {
         selects: [peca_detail, null],
         select: true,
       })
-      this.mostrarcasaspossiveis(peca_detail)
+      this.mostrarcasaspossiveis(peca_detail, true, this.state.tabuleiro)
     }
     if (this.state.select === false && peca_detail.nome !== null && peca_detail.cor === this.state.turn) {
       this.setState({
         selects: [peca_detail, null],
         select: true,
       })
-      this.mostrarcasaspossiveis(peca_detail)
+      this.mostrarcasaspossiveis(peca_detail, true, this.state.tabuleiro)
 
     }else if(peca_detail.selectable){
         let tabuleiro = this.state.tabuleiro
@@ -112,10 +130,14 @@ export default class Xadrez extends React.Component {
               tabuleiro
           })
           this.limparcasaspossiveis()
-          // if(this.this_is_xeque(peca_detail.lin, peca_detail.col)){
-          //   console.warn('xeque')
-          // }
           
+          tabuleiro = this.calcameacas(tabuleiro,false)
+          
+          if(this.rei_em_xeque(this.state.turn === 'w' ? 'b' : 'w', tabuleiro)){
+            this.setState({xeque: true})
+          }else{
+            this.setState({xeque:false})
+          }
     }
   }
 
@@ -134,9 +156,9 @@ export default class Xadrez extends React.Component {
     })
   }
 
-  mostrarcasaspossiveis = (peca_detail) => {
+  mostrarcasaspossiveis = (peca_detail, before = true, tabuleiro, setState= true) => {
     let posicpossiveis = []
-    let tabuleiro =  this.state.tabuleiro
+    let tabuleiroalternativo = []
     const movimentos = {
       t: torre,
       b: bispo,
@@ -144,26 +166,46 @@ export default class Xadrez extends React.Component {
       ra: rainha,
       re: rei
     }
+    
     const funcaoMovimento = movimentos[peca_detail.nome]
     if (funcaoMovimento) {
       posicpossiveis = funcaoMovimento(peca_detail, tabuleiro, this.is_valid, pecas)
     }
     if (peca_detail.nome === 'p'){
-      posicpossiveis = peao(peca_detail,tabuleiro, this.state.enpassant, this.is_valid, pecas)
+      if(before){
+        posicpossiveis = peao(peca_detail,tabuleiro, this.state.enpassant, this.is_valid, pecas)
+      }else{
+        posicpossiveis = peao(peca_detail,tabuleiro, this.state.enpassant, this.is_valid, pecas,true)
+      }
+      
+      
     }
-    console.warn(tabuleiro)
     Array.from({ length: 8 }).map((_, col) => (
         Array.from({ length: 8 }).map((_, lin) => {
           const existe = posicpossiveis.some(p => p[0] === lin && p[1] === col);
-          let peca = this.state.tabuleiro[lin][col] 
-          if (existe) {
-            tabuleiro[lin][col] =[peca[0], peca[1], true, peca[3], peca[4]]
-           }
+          let peca = tabuleiro[lin][col] 
+          if (existe && before) {
+            
+            tabuleiroalternativo = this.simularmovimento([peca_detail.lin, peca_detail.col],[lin,col],tabuleiro)
+            if(!this.rei_em_xeque(this.state.turn, tabuleiroalternativo)){
+              tabuleiro[lin][col] = [peca[0], peca[1], true, peca[3], peca[4]]
+            }
+            
+            
+            
+          }else if(!before && existe){
+            tabuleiro[lin][col] = [peca[0], peca[1], false, peca[3], peca[4]+1]
+          }
           })
     ))
-    this.setState({
-      tabuleiro,
-    })
+    if(setState){
+      this.setState({
+        tabuleiro,
+      })
+    }else{
+      return tabuleiro
+    }
+    
   }
   
   
@@ -173,7 +215,7 @@ export default class Xadrez extends React.Component {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.reiniciar}
-          onPress={() => this.setState(initialstate)}
+          onPress={() => this.setState(InitialState())}
         >
           <Text style={{ color: 'white', fontWeight: '600' }}>Reiniciar</Text>
         </TouchableOpacity>
@@ -183,9 +225,6 @@ export default class Xadrez extends React.Component {
               {Array.from({ length: 8 }).map((_, lin) => {
                 const color = (col + lin) % 2 === 0 ? 'white' : 'black'
                 let peca_detail = this.state.tabuleiro[lin][col] 
-
-                // peca_detail = peca_detail[0] !== null && peca_detail[0] === 'o' ? [null,null,'o',null] : peca_detail
-
                 return (
                   <Quadrado
                     key={`${col}-${lin}`}
@@ -198,7 +237,7 @@ export default class Xadrez extends React.Component {
                         col: col,
                         lin: lin,
                         selectable: peca_detail[2],
-                        piecemoves: peca_detail[3] 
+                        piecemoves: peca_detail[3]
                       })
                     }
                   >
@@ -208,6 +247,7 @@ export default class Xadrez extends React.Component {
                       col={cols[col]}
                       lin={-1 * (lin - 8)}
                       select={peca_detail[2]}
+                      xeque={this.state.xeque && peca_detail[0] === 're' && peca_detail[1] === this.state.turn? true: false}
                     />
                   </Quadrado>
                 )

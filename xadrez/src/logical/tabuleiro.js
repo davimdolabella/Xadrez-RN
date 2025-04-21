@@ -21,16 +21,6 @@ const tabuleiro = [
       ['p', 'b', false, 0, 0]
     ],
     [
-      [null, null, false, 0, 2],
-      [null, null, false, 0, 2],
-      [null, null, false, 0, 3],
-      [null, null, false, 0, 2],
-      [null, null, false, 0, 2],
-      [null, null, false, 0, 3],
-      [null, null, false, 0, 2],
-      [null, null, false, 0, 2]
-    ],
-    [
       [null, null, false, 0, 0],
       [null, null, false, 0, 0],
       [null, null, false, 0, 0],
@@ -51,14 +41,24 @@ const tabuleiro = [
       [null, null, false, 0, 0]
     ],
     [
-        [null, null, false, 0, 2],
-        [null, null, false, 0, 2],
-        [null, null, false, 0, 3],
-        [null, null, false, 0, 2],
-        [null, null, false, 0, 2],
-        [null, null, false, 0, 3],
-        [null, null, false, 0, 2],
-        [null, null, false, 0, 2]
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0],
+      [null, null, false, 0, 0]
+    ],
+    [
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0],
+        [null, null, false, 0, 0]
     ],
     [
       ['p', 'w', false, 0, 0],

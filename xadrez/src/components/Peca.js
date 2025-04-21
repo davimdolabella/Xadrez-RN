@@ -10,11 +10,14 @@ export default props =>{
             fontWeight: 'bold',
             textAlign: 'center',
             lineHeight: 50,
+            width: '100%',
+            height:'100%',
+            backgroundColor: props.xeque?  'rgba(186, 41, 41, 0.47)':'rgba(0, 0, 0, 0)'
         },
         select:{
             position: 'absolute',
-            top: props.tipo !== 'null'? -40 : -10,
-            fontSize: props.tipo !== 'null'? 80 : 50,
+            top: props.tipo !== null? -40 : -36,
+            fontSize: props.tipo !== null? 80 : 90,
             color:'rgba(0,0,0,0.2)',
             fontWeight: 'bold',
             textAlign: 'center',
@@ -29,10 +32,12 @@ export default props =>{
             {props.tipo === 'b'? '♗' : null}
             {props.tipo === 'ra'? '♕' : null}
             {props.tipo === 're'? '♔' : null}
+            
         </Text>
         <Text style={styles.select}>
-            {props.select? 'o' :null}
+            {props.select? props.tipo === null? '•': 'o' :null}
         </Text>
+        
         </>
         
     )
