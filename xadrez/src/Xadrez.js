@@ -31,11 +31,7 @@ export default class Xadrez extends React.Component {
   
   state = InitialState()
   // gettabuleiro = JSON.parse(JSON.stringify(this.state.tabuleiro))
-  fimdejogo = (cor) =>{
-
-  }
-  calcposicpossiveis = (peca) => {
-    
+  fimdejogo = (cor, tabuleiro) => {
   }
   rei_em_xeque = (color, tabuleiro) =>{
     let rei = null
@@ -138,6 +134,7 @@ export default class Xadrez extends React.Component {
           }else{
             this.setState({xeque:false})
           }
+          this.fimdejogo('b', tabuleiro)
     }
   }
 
